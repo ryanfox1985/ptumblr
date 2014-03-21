@@ -1,0 +1,5 @@
+{
+	"INPUT_FOLDER" = "ruta1", 
+	"OUTPUT_FOLDER" = "ruta2",
+	"DEFAULT_TAGS" = ["label1", "label2"]
+}
