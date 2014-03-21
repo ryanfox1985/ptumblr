@@ -1,5 +1,0 @@
-{
-	“INPUT_FOLDER” = ‘ruta1’ #default path+’input’
-	“OUTPUT_FOLDER” = ‘ruta2’ #default path+’output’
-	“DEFAULT_TAGS” = [‘label1’, ‘label2’]
-}
