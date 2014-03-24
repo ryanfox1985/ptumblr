@@ -1,10 +1,8 @@
-import com.sun.deploy.util.StringUtils;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.List;
 import java.util.Properties;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by Adrian on 3/22/2014.
@@ -43,7 +41,7 @@ public class Main {
             Properties properties = new Properties();
             properties.setProperty("input_folder", input_folder);
             properties.setProperty("output_folder", output_folder);
-            properties.setProperty("default_tags", org.apache.commons.lang.StringUtils.join(tags, ","));
+            properties.setProperty("default_tags", StringUtils.join(tags, ","));
 
             properties.store(output, "");
         } catch (IOException e) {
