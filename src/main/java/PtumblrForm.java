@@ -1,13 +1,17 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Adrian on 3/22/2014.
  */
-public class PtumblrForm extends JFrame{
+public class PtumblrForm extends JFrame {
     private JProgressBar prbApp;
     private JButton btnSend;
     private JPanel rootPanel;
@@ -17,19 +21,21 @@ public class PtumblrForm extends JFrame{
     private JButton btnOutputFolder;
     private JButton btnScan;
     private JPanel pnlTags;
-    private JPanel pnlImage;
+    private JLabel lblImage;
 
+    private File currentImage = null;
     private List<JLabel> lblTags = new ArrayList<JLabel>();
+    private List<File> images = new ArrayList<File>();
 
 
-    private void loadTags(String[] tags){
-        for(JLabel lbl: lblTags){
+    private void loadTags(String[] tags) {
+        for (JLabel lbl : lblTags) {
             pnlTags.remove(lbl);
         }
 
         lblTags.clear();
 
-        for(String tag: tags){
+        for (String tag : tags) {
             JLabel lblTag = new JLabel(tag);
             lblTag.setOpaque(true);
             lblTag.setBackground(Color.YELLOW);
@@ -37,9 +43,9 @@ public class PtumblrForm extends JFrame{
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     JLabel lbl = (JLabel) e.getComponent();
-                    if (lbl.getBackground() == Color.GRAY){
+                    if (lbl.getBackground() == Color.GRAY) {
                         lbl.setBackground(Color.YELLOW);
-                    } else{
+                    } else {
                         lbl.setBackground(Color.GRAY);
                     }
 
@@ -51,19 +57,19 @@ public class PtumblrForm extends JFrame{
         }
     }
 
-    private void resetTags(){
-        for(JLabel lbl: lblTags){
+    private void resetTags() {
+        for (JLabel lbl : lblTags) {
             lbl.setBackground(Color.YELLOW);
         }
     }
 
 
-    private void setBtnEvents(){
+    private void setBtnEvents() {
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(rootPanel,
-                        "Eggs are not supposed to be green.");
+                sendTumbler();
+                loadNextImage();
             }
         });
 
@@ -75,7 +81,7 @@ public class PtumblrForm extends JFrame{
                 Integer opt = j.showSaveDialog(PtumblrForm.this);
 
 
-                if(opt == JFileChooser.APPROVE_OPTION){
+                if (opt == JFileChooser.APPROVE_OPTION) {
                     txtInputFolder.setText(j.getSelectedFile().getPath());
                 }
             }
@@ -89,7 +95,7 @@ public class PtumblrForm extends JFrame{
                 Integer opt = j.showSaveDialog(PtumblrForm.this);
 
 
-                if(opt == JFileChooser.APPROVE_OPTION){
+                if (opt == JFileChooser.APPROVE_OPTION) {
                     txtOutputFolder.setText(j.getSelectedFile().getPath());
                 }
             }
@@ -103,19 +109,60 @@ public class PtumblrForm extends JFrame{
         });
     }
 
-    public void clickScanFolders(){
-//        try {
-            //TODO: each input folder.
-            resetTags();
+    public void clickScanFolders() {
+        File input_folder = new File(txtInputFolder.getText());
+
+        for (File fileEntry : input_folder.listFiles()) {
+            if (!fileEntry.isDirectory() && !fileEntry.getName().startsWith(".")) {
+                //TODO: Check extension
+                images.add(fileEntry);
+            }
+        }
+
+        //TODO: Check progress bar not working
+        prbApp.setMinimum(0);
+        prbApp.setMaximum(images.size()-1);
+        prbApp.setValue(0);
 
 
-            //BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\Adrian\\Downloads\\IMG-20131123-WA0000.jpg"));
-            //pnlImage.setIcon(new ImageIcon(myPicture));
+        loadNextImage();
+    }
 
-//        } catch (IOException e) {
-//            JOptionPane.showMessageDialog(rootPanel,
-//                    "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
-//        }
+    public void loadNextImage() {
+        resetTags();
+
+        if (images.size() > 0) {
+            //TODO: get random image.
+            currentImage = images.get(0);
+
+            try {
+                BufferedImage myPicture = ImageIO.read(currentImage);
+                lblImage.setIcon(new ImageIcon(myPicture));
+
+                images.remove(currentImage);
+                prbApp.setValue(prbApp.getValue() + 1);
+
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(rootPanel,
+                        "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(rootPanel,
+                    "The input folder is empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void sendTumbler() {
+
+        if(currentImage != null){
+
+            //TODO: GET YELLOW TAGS
+            //TODO: send to tumblr.com
+            //TODO: mov current image to output.
+        }
+
+
     }
 
 
