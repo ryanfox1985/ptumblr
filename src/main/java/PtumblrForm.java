@@ -20,12 +20,8 @@ public class PtumblrForm extends JFrame{
     private JButton btnOutputFolder;
     private JButton btnScan;
 
-    public PtumblrForm() {
-        super("PTumblr App");
-        setContentPane(rootPanel);
-        pack();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+    private void setBtnEvents(){
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -33,18 +29,6 @@ public class PtumblrForm extends JFrame{
                         "Eggs are not supposed to be green.");
             }
         });
-
-        try {
-            BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\Adrian\\Downloads\\IMG-20131123-WA0000.jpg"));
-            imageLabel.setIcon(new ImageIcon(myPicture));
-
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(rootPanel,
-                    "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-
-
 
         btnInputFolder.addActionListener(new ActionListener() {
             @Override
@@ -59,6 +43,7 @@ public class PtumblrForm extends JFrame{
                 }
             }
         });
+
         btnOutputFolder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -72,6 +57,41 @@ public class PtumblrForm extends JFrame{
                 }
             }
         });
+
+        btnScan.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickScanFolders();
+            }
+        });
+    }
+
+    public void clickScanFolders(){
+        try {
+            //TODO: each input folder.
+            BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\Adrian\\Downloads\\IMG-20131123-WA0000.jpg"));
+            imageLabel.setIcon(new ImageIcon(myPicture));
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(rootPanel,
+                    "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    public PtumblrForm(String input_folder, String output_folder, String[] tags) {
+        super("PTumblr App");
+        setContentPane(rootPanel);
+        pack();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBtnEvents();
+
+        txtInputFolder.setText(input_folder);
+        txtOutputFolder.setText(output_folder);
+
+        //TODO: Load labels
+
+        clickScanFolders();
 
         setVisible(true);
     }
