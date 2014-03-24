@@ -1,28 +1,65 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Adrian on 3/22/2014.
  */
 public class PtumblrForm extends JFrame{
-    private JProgressBar progressBar1;
-    private JButton button1;
+    private JProgressBar prbApp;
+    private JButton btnSend;
     private JPanel rootPanel;
-    private JLabel imageLabel;
     private JTextField txtInputFolder;
     private JButton btnInputFolder;
     private JTextField txtOutputFolder;
     private JButton btnOutputFolder;
     private JButton btnScan;
+    private JPanel pnlTags;
+    private JPanel pnlImage;
+
+    private List<JLabel> lblTags = new ArrayList<JLabel>();
+
+
+    private void loadTags(String[] tags){
+        for(JLabel lbl: lblTags){
+            pnlTags.remove(lbl);
+        }
+
+        lblTags.clear();
+
+        for(String tag: tags){
+            JLabel lblTag = new JLabel(tag);
+            lblTag.setOpaque(true);
+            lblTag.setBackground(Color.YELLOW);
+            lblTag.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    JLabel lbl = (JLabel) e.getComponent();
+                    if (lbl.getBackground() == Color.GRAY){
+                        lbl.setBackground(Color.YELLOW);
+                    } else{
+                        lbl.setBackground(Color.GRAY);
+                    }
+
+                }
+            });
+
+            pnlTags.add(lblTag);
+            lblTags.add(lblTag);
+        }
+    }
+
+    private void resetTags(){
+        for(JLabel lbl: lblTags){
+            lbl.setBackground(Color.YELLOW);
+        }
+    }
 
 
     private void setBtnEvents(){
-        button1.addActionListener(new ActionListener() {
+        btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(rootPanel,
@@ -67,15 +104,18 @@ public class PtumblrForm extends JFrame{
     }
 
     public void clickScanFolders(){
-        try {
+//        try {
             //TODO: each input folder.
-            BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\Adrian\\Downloads\\IMG-20131123-WA0000.jpg"));
-            imageLabel.setIcon(new ImageIcon(myPicture));
+            resetTags();
 
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(rootPanel,
-                    "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+
+            //BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\Adrian\\Downloads\\IMG-20131123-WA0000.jpg"));
+            //pnlImage.setIcon(new ImageIcon(myPicture));
+
+//        } catch (IOException e) {
+//            JOptionPane.showMessageDialog(rootPanel,
+//                    "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+//        }
     }
 
 
@@ -90,7 +130,7 @@ public class PtumblrForm extends JFrame{
         txtOutputFolder.setText(output_folder);
 
         //TODO: Load labels
-
+        loadTags(tags);
         clickScanFolders();
 
         setVisible(true);
