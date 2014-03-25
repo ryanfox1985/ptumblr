@@ -112,12 +112,15 @@ public class PtumblrForm extends JFrame {
     }
 
     public void clickScanFolders() {
+        images.clear();
         File input_folder = new File(txtInputFolder.getText());
 
-        for (File fileEntry : input_folder.listFiles()) {
-            if (!fileEntry.isDirectory() && !fileEntry.getName().startsWith(".")) {
-                //TODO: Check extension
-                images.add(fileEntry);
+        if(input_folder.getPath().length() > 0) {
+            for (File fileEntry : input_folder.listFiles()) {
+                if (!fileEntry.isDirectory() && !fileEntry.getName().startsWith(".")) {
+                    //TODO: Check extension
+                    images.add(fileEntry);
+                }
             }
         }
 
