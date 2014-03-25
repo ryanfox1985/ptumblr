@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.Properties;
 
+import com.tumblr.jumblr.JumblrClient;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -20,7 +21,13 @@ public class Main {
     private String output_folder = "output";
     private String[] tags = {};
 
+    private String oauth_consumer_key = "";
+    private String secret_key = "";
+    private String token = "";
+    private String token_secret = "";
+
     private PtumblrForm form_ui;
+    private JumblrClient tumblrClient = new JumblrClient();
     private String appPath = new File(".").getAbsolutePath();
 
 
@@ -53,6 +60,16 @@ public class Main {
         input_folder = properties.getProperty("input_folder", "input");
         output_folder = properties.getProperty("output_folder", appPath + File.separator + "output");
         String strTags = properties.getProperty("default_tags", "");
+
+
+        oauth_consumer_key = properties.getProperty("oauth_consumer_key", "");
+        secret_key = properties.getProperty("secret_key", "");
+        token = properties.getProperty("token", "");
+        token_secret = properties.getProperty("token_secret", "");
+
+        tumblrClient = new JumblrClient(oauth_consumer_key, secret_key);
+        tumblrClient.setToken(token, token_secret);
+
         tags = strTags.split(",");
     }
 
@@ -85,6 +102,11 @@ public class Main {
             properties.setProperty("output_folder", output_folder);
             properties.setProperty("default_tags", StringUtils.join(tags, ","));
 
+            properties.setProperty("oauth_consumer_key", oauth_consumer_key);
+            properties.setProperty("secret_key", secret_key);
+            properties.setProperty("token", token);
+            properties.setProperty("token_secret", token_secret);
+
             properties.store(output, "");
         } catch (IOException e) {
             System.out.println("Can't save properties in " + fileName);
@@ -94,7 +116,7 @@ public class Main {
 
     //Initialize user interface
     public void initializeUI() {
-        form_ui = new PtumblrForm(input_folder, output_folder, tags);
+        form_ui = new PtumblrForm(input_folder, output_folder, tags, tumblrClient);
         form_ui.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
