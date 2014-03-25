@@ -32,9 +32,9 @@ public class Main {
             File fileConfig = new File(fileName);
             InputStream input;
 
-            if(fileConfig.exists()){
+            if (fileConfig.exists()) {
                 input = new FileInputStream(fileName);
-            } else{
+            } else {
                 if (!fileName.startsWith("/")) {
                     fileName = "/" + fileName;
                 }
@@ -43,7 +43,7 @@ public class Main {
 
             if (input != null) {
                 properties.load(input);
-            } else{
+            } else {
                 System.out.println("Can't load properties in " + fileName);
             }
         } catch (Exception e) {
@@ -99,6 +99,10 @@ public class Main {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
+
+                input_folder = form_ui.getInputFolder();
+                output_folder = form_ui.getOutputFolder();
+
                 saveProperties(CONFIG_FILE_PATH);
             }
         });

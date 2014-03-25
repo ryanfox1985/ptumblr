@@ -24,11 +24,19 @@ public class PtumblrForm extends JFrame {
     private JButton btnScan;
     private JPanel pnlTags;
     private JLabel lblImage;
+    private JButton btnCancel;
 
     private File currentImage = null;
     private List<JLabel> lblTags = new ArrayList<JLabel>();
     private List<File> images = new ArrayList<File>();
 
+    public String getInputFolder() {
+        return txtInputFolder.getText();
+    }
+
+    public String getOutputFolder() {
+        return txtOutputFolder.getText();
+    }
 
     private void loadTags(String[] tags) {
         for (JLabel lbl : lblTags) {
@@ -70,7 +78,16 @@ public class PtumblrForm extends JFrame {
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                prbApp.setValue(prbApp.getValue() + 1);
                 sendTumbler();
+                loadNextImage();
+            }
+        });
+
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prbApp.setValue(prbApp.getValue() + 1);
                 loadNextImage();
             }
         });
@@ -115,20 +132,21 @@ public class PtumblrForm extends JFrame {
         images.clear();
         File input_folder = new File(txtInputFolder.getText());
 
-        if(input_folder.getPath().length() > 0) {
+        if (input_folder.getPath().length() > 0) {
             for (File fileEntry : input_folder.listFiles()) {
                 if (!fileEntry.isDirectory() && !fileEntry.getName().startsWith(".")) {
-                    //TODO: Check extension
-                    images.add(fileEntry);
+                    //Check extension
+                    if (fileEntry.getName().endsWith(".jpg") || fileEntry.getName().endsWith(".jpeg") || fileEntry.getName().endsWith(".gif") || fileEntry.getName().endsWith(".png")) {
+                        images.add(fileEntry);
+                    }
                 }
             }
         }
 
-        //TODO: Check progress bar not working
         prbApp.setMinimum(0);
-        prbApp.setMaximum(images.size()-1);
+        prbApp.setMaximum(images.size());
         prbApp.setValue(0);
-
+        prbApp.setStringPainted(true);
 
         loadNextImage();
     }
@@ -145,8 +163,6 @@ public class PtumblrForm extends JFrame {
                 lblImage.setIcon(new ImageIcon(myPicture));
 
                 images.remove(currentImage);
-                prbApp.setValue(prbApp.getValue() + 1);
-
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(rootPanel,
                         "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -160,8 +176,7 @@ public class PtumblrForm extends JFrame {
 
     public void sendTumbler() {
 
-        if(currentImage != null){
-
+        if (currentImage != null) {
             //TODO: GET YELLOW TAGS
             //TODO: send to tumblr.com
             //TODO: mov current image to output.
