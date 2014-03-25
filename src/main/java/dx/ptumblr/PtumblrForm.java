@@ -1,5 +1,7 @@
 package dx.ptumblr;
 
+import org.apache.commons.io.FileUtils;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +9,9 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -178,8 +182,20 @@ public class PtumblrForm extends JFrame {
 
         if (currentImage != null) {
             //TODO: GET YELLOW TAGS
+
             //TODO: send to tumblr.com
-            //TODO: mov current image to output.
+
+            //TODO: check move file.
+            Date now = new Date();
+            SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String outputFileName = txtOutputFolder.getText() + File.separator + dt.format(now) + currentImage.getName();
+
+//            try {
+//                FileUtils.moveFile(currentImage, new File(outputFileName));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                JOptionPane.showMessageDialog(null, "Can't move the image to output folder..", "Error", JOptionPane.ERROR_MESSAGE);
+//            }
         }
 
 
@@ -196,7 +212,7 @@ public class PtumblrForm extends JFrame {
         txtInputFolder.setText(input_folder);
         txtOutputFolder.setText(output_folder);
 
-        //TODO: Load labels
+        //TODO: Custom labels
         loadTags(tags);
         clickScanFolders();
 

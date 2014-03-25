@@ -31,6 +31,11 @@
             <artifactId>jumblr</artifactId>
             <version>0.0.8</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
     </dependencies>
 
     <properties>
