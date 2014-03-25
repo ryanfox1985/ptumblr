@@ -4,6 +4,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.Properties;
+
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -14,6 +15,7 @@ import javax.swing.*;
 public class Main {
 
     // Set defaults
+    private String CONFIG_FILE_PATH = "config.properties";
     private String input_folder = "input";
     private String output_folder = "output";
     private String[] tags = {};
@@ -27,9 +29,24 @@ public class Main {
         Properties properties = new Properties();
 
         try {
-            InputStream input = Main.class.getResourceAsStream(fileName);
-            properties.load(input);
-        } catch (IOException e) {
+            File fileConfig = new File(fileName);
+            InputStream input;
+
+            if(fileConfig.exists()){
+                input = new FileInputStream(fileName);
+            } else{
+                if (!fileName.startsWith("/")) {
+                    fileName = "/" + fileName;
+                }
+                input = Main.class.getResourceAsStream(fileName);
+            }
+
+            if (input != null) {
+                properties.load(input);
+            } else{
+                System.out.println("Can't load properties in " + fileName);
+            }
+        } catch (Exception e) {
             System.out.println("Can't load properties in " + fileName);
         }
 
@@ -40,16 +57,16 @@ public class Main {
     }
 
 
-    private void checkFolders(){
+    private void checkFolders() {
         File file_input = new File(input_folder);
         if (!file_input.exists()) {
-            JOptionPane.showMessageDialog(null, "Warning input folder doesn't exist.");
+            JOptionPane.showMessageDialog(null, "The input folder doesn't exist.", "Warning", JOptionPane.WARNING_MESSAGE);
             input_folder = "";
         }
 
         File file_output = new File(output_folder);
         if (!file_output.exists()) {
-            JOptionPane.showMessageDialog(null, "Warning output folder doesn't exist. It uses the default.");
+            JOptionPane.showMessageDialog(null, "The output folder doesn't exist. It uses the default.", "Warning", JOptionPane.WARNING_MESSAGE);
 
             //set default
             output_folder = appPath + File.separator + "output";
@@ -60,6 +77,7 @@ public class Main {
 
     private void saveProperties(String fileName) {
         try {
+            //TODO: Save properties in recurse file
             OutputStream output = new FileOutputStream(fileName);
 
             Properties properties = new Properties();
@@ -79,8 +97,9 @@ public class Main {
         form_ui = new PtumblrForm(input_folder, output_folder, tags);
         form_ui.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
-                saveProperties("/config.properties");
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                saveProperties(CONFIG_FILE_PATH);
             }
         });
     }
@@ -88,7 +107,7 @@ public class Main {
 
     //Start application
     public void start(String args[]) throws IOException {
-        loadProperties("/config.properties");
+        loadProperties(CONFIG_FILE_PATH);
         checkFolders();
         initializeUI();
     }
