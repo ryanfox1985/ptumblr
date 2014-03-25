@@ -4,6 +4,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.Properties;
+
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -28,13 +29,24 @@ public class Main {
         Properties properties = new Properties();
 
         try {
-            InputStream input = Main.class.getResourceAsStream(fileName);
-            if (input == null){
+            File fileConfig = new File(fileName);
+            InputStream input;
+
+            if(fileConfig.exists()){
                 input = new FileInputStream(fileName);
+            } else{
+                if (!fileName.startsWith("/")) {
+                    fileName = "/" + fileName;
+                }
+                input = Main.class.getResourceAsStream(fileName);
             }
 
-            properties.load(input);
-        } catch (Exception e){
+            if (input != null) {
+                properties.load(input);
+            } else{
+                System.out.println("Can't load properties in " + fileName);
+            }
+        } catch (Exception e) {
             System.out.println("Can't load properties in " + fileName);
         }
 
@@ -45,7 +57,7 @@ public class Main {
     }
 
 
-    private void checkFolders(){
+    private void checkFolders() {
         File file_input = new File(input_folder);
         if (!file_input.exists()) {
             JOptionPane.showMessageDialog(null, "The input folder doesn't exist.", "Warning", JOptionPane.WARNING_MESSAGE);
