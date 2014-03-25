@@ -26,6 +26,11 @@
             <artifactId>commons-lang</artifactId>
             <version>2.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.tumblr</groupId>
+            <artifactId>jumblr</artifactId>
+            <version>0.0.8</version>
+        </dependency>
     </dependencies>
 
     <properties>
