@@ -36,8 +36,8 @@ public class PtumblrForm extends JFrame {
     private JButton btnCancel;
 
     private File currentImage = null;
-    private List<JLabel> lblTags = new ArrayList<JLabel>();
-    private List<File> images = new ArrayList<File>();
+    private List<JLabel> lblTags = new ArrayList<>();
+    private List<File> images = new ArrayList<>();
     private Random rand = new Random();
     private JumblrClient tumblrClient;
 
@@ -177,9 +177,9 @@ public class PtumblrForm extends JFrame {
     public void loadNextImage() {
         resetTags();
         //TODO: reset custom labels tags
+        //TODO: reset custom comment
 
         if (images.size() > 0) {
-            //TODO: get random image.
             int indexImage = (rand.nextInt() % images.size()) + 1;
             currentImage = images.get(indexImage);
 
@@ -252,7 +252,7 @@ public class PtumblrForm extends JFrame {
             //TODO: append custom tags
 
 
-            //TODO: send to tumblr.com
+            //send to tumblr.com
             postImage(aTags);
 
             //move file.

@@ -3,15 +3,18 @@ package dx.ptumblr;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Properties;
 
 import com.tumblr.jumblr.JumblrClient;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
+
+//TODO: Logs system.
+//TODO: Support multilabel.
+//TODO: Show total images.
+//TODO: Append some text.
+//TODO: Form refactors.
 
 /**
  * Created by Adrian on 3/22/2014.
@@ -101,7 +104,7 @@ public class Main {
 
     private void saveProperties(String fileName) {
         try {
-            //TODO: Save properties in recurse file
+            //Save properties in recurse file
             OutputStream output = new FileOutputStream(fileName);
             Writer writer = new OutputStreamWriter(output, "UTF-8");
 
