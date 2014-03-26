@@ -3,6 +3,9 @@ package dx.ptumblr;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import com.tumblr.jumblr.JumblrClient;
@@ -49,7 +52,8 @@ public class Main {
             }
 
             if (input != null) {
-                properties.load(input);
+                Reader reader = new InputStreamReader(input, "UTF-8");
+                properties.load(reader);
             } else {
                 System.out.println("Can't load properties in " + fileName);
             }
@@ -60,17 +64,20 @@ public class Main {
         input_folder = properties.getProperty("input_folder", "input");
         output_folder = properties.getProperty("output_folder", appPath + File.separator + "output");
         String strTags = properties.getProperty("default_tags", "");
-
+        tags = strTags.split(",");
 
         oauth_consumer_key = properties.getProperty("oauth_consumer_key", "");
         secret_key = properties.getProperty("secret_key", "");
         token = properties.getProperty("token", "");
         token_secret = properties.getProperty("token_secret", "");
 
-        tumblrClient = new JumblrClient(oauth_consumer_key, secret_key);
-        tumblrClient.setToken(token, token_secret);
+        try {
+            tumblrClient = new JumblrClient(oauth_consumer_key, secret_key);
+            tumblrClient.setToken(token, token_secret);
+        } catch (IllegalArgumentException e){
+            System.out.println("jumblr error-> " + e.getMessage());
+        }
 
-        tags = strTags.split(",");
     }
 
 
@@ -96,6 +103,7 @@ public class Main {
         try {
             //TODO: Save properties in recurse file
             OutputStream output = new FileOutputStream(fileName);
+            Writer writer = new OutputStreamWriter(output, "UTF-8");
 
             Properties properties = new Properties();
             properties.setProperty("input_folder", input_folder);
@@ -107,7 +115,7 @@ public class Main {
             properties.setProperty("token", token);
             properties.setProperty("token_secret", token_secret);
 
-            properties.store(output, "");
+            properties.store(writer, "");
         } catch (IOException e) {
             System.out.println("Can't save properties in " + fileName);
         }
