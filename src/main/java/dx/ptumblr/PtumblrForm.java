@@ -180,23 +180,24 @@ public class PtumblrForm extends JFrame {
         //TODO: reset custom comment
 
         if (images.size() > 0) {
-            int indexImage = (rand.nextInt() % images.size()) + 1;
+            int indexImage = rand.nextInt(images.size());
             currentImage = images.get(indexImage);
 
             try {
                 BufferedImage myPicture = ImageIO.read(currentImage);
 
-                int height, width;
-                float ratio;
 
-                if (myPicture.getHeight() > myPicture.getWidth()) {
+                int height = myPicture.getHeight();
+                int width = myPicture.getWidth();
+
+                if (myPicture.getWidth() > lblImage.getWidth()){
                     width = lblImage.getWidth();
-                    ratio = (float) myPicture.getHeight() / myPicture.getWidth();
-                    height = (int) (lblImage.getHeight() / ratio);
-                } else {
+                    height = (width * myPicture.getHeight()) / myPicture.getWidth();
+                }
+
+                if (height > lblImage.getHeight()){
                     height = lblImage.getHeight();
-                    ratio = (float) myPicture.getWidth() / myPicture.getHeight();
-                    width = (int) (lblImage.getWidth() / ratio);
+                    width = (height * myPicture.getWidth()) / myPicture.getHeight();
                 }
 
                 Image dimg = myPicture.getScaledInstance(width, height, Image.SCALE_SMOOTH);

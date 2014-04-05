@@ -104,7 +104,7 @@ public class Main {
 
     private void saveProperties(String fileName) {
         try {
-            //Save properties in recurse file
+            //Save properties in resources file
             OutputStream output = new FileOutputStream(fileName);
             Writer writer = new OutputStreamWriter(output, "UTF-8");
 
