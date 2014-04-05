@@ -3,6 +3,9 @@ package dx.ptumblr;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import com.tumblr.jumblr.JumblrClient;
@@ -16,127 +19,105 @@ import javax.swing.*;
 //TODO: Append some text.
 //TODO: Form refactors.
 
-/**
- * Created by Adrian on 3/22/2014.
- */
 public class Main {
 
     // Set defaults
-    private String CONFIG_FILE_PATH = "config.properties";
-    private String input_folder = "input";
-    private String output_folder = "output";
-    private String[] tags = {};
-
-    private String oauth_consumer_key = "";
-    private String secret_key = "";
-    private String token = "";
-    private String token_secret = "";
-
-    private PtumblrForm form_ui;
-    private JumblrClient tumblrClient = new JumblrClient();
-    private String appPath = new File(".").getAbsolutePath();
-
+    private static final String CONFIG_FILE_PATH = "config.properties";
 
     //Load config.properties
-    private void loadProperties(String fileName) throws IOException {
+    private PtumblrManager loadProperties() throws IOException {
         Properties properties = new Properties();
 
         try {
-            File fileConfig = new File(fileName);
+            File fileConfig = new File(CONFIG_FILE_PATH);
             InputStream input;
 
-            if (fileConfig.exists()) {
-                input = new FileInputStream(fileName);
-            } else {
-                if (!fileName.startsWith("/")) {
-                    fileName = "/" + fileName;
-                }
-                input = Main.class.getResourceAsStream(fileName);
+            if (!fileConfig.exists()) {
+                fileConfig.createNewFile();
             }
+
+            input = new FileInputStream(CONFIG_FILE_PATH);
 
             if (input != null) {
                 Reader reader = new InputStreamReader(input, "UTF-8");
                 properties.load(reader);
             } else {
-                System.out.println("Can't load properties in " + fileName);
+                System.out.println("Can't load properties in " + CONFIG_FILE_PATH);
             }
         } catch (Exception e) {
-            System.out.println("Can't load properties in " + fileName);
+            System.out.println("Can't load properties in " + CONFIG_FILE_PATH);
         }
 
-        input_folder = properties.getProperty("input_folder", "input");
-        output_folder = properties.getProperty("output_folder", appPath + File.separator + "output");
+        String inputFolder = properties.getProperty("input_folder", "");
+        String outputFolder = properties.getProperty("output_folder", "");
         String strTags = properties.getProperty("default_tags", "");
-        tags = strTags.split(",");
+        String[] tmpTags = strTags.split(",");
+        ArrayList<String> tags = new ArrayList<>();
+        Collections.addAll(tags, tmpTags);
 
-        oauth_consumer_key = properties.getProperty("oauth_consumer_key", "");
-        secret_key = properties.getProperty("secret_key", "");
-        token = properties.getProperty("token", "");
-        token_secret = properties.getProperty("token_secret", "");
+        String oauthConsumerKey = properties.getProperty("oauth_consumer_key", "");
+        String secretKey = properties.getProperty("secret_key", "");
+        String token = properties.getProperty("token", "");
+        String tokenSecret = properties.getProperty("token_secret", "");
 
-        try {
-            tumblrClient = new JumblrClient(oauth_consumer_key, secret_key);
-            tumblrClient.setToken(token, token_secret);
-        } catch (IllegalArgumentException e){
-            System.out.println("jumblr error-> " + e.getMessage());
-        }
+        PtumblrManager ptumblrManager = new PtumblrManager(inputFolder, outputFolder, tags, oauthConsumerKey, secretKey, token, tokenSecret);
 
+        return ptumblrManager;
     }
 
-
-    private void checkFolders() {
-        File file_input = new File(input_folder);
-        if (!file_input.exists()) {
-            JOptionPane.showMessageDialog(null, "The input folder doesn't exist.", "Warning", JOptionPane.WARNING_MESSAGE);
-            input_folder = "";
-        }
-
-        File file_output = new File(output_folder);
-        if (!file_output.exists()) {
-            JOptionPane.showMessageDialog(null, "The output folder doesn't exist. It uses the default.", "Warning", JOptionPane.WARNING_MESSAGE);
-
-            //set default
-            output_folder = appPath + File.separator + "output";
-            file_output = new File(output_folder);
-            file_output.mkdirs();
-        }
-    }
-
-    private void saveProperties(String fileName) {
+    private void saveProperties(PtumblrManager ptumblrManager) {
         try {
             //Save properties in resources file
-            OutputStream output = new FileOutputStream(fileName);
+            OutputStream output = new FileOutputStream(CONFIG_FILE_PATH);
             Writer writer = new OutputStreamWriter(output, "UTF-8");
 
             Properties properties = new Properties();
-            properties.setProperty("input_folder", input_folder);
-            properties.setProperty("output_folder", output_folder);
-            properties.setProperty("default_tags", StringUtils.join(tags, ","));
+            properties.setProperty("input_folder", ptumblrManager.getInputFolder());
+            properties.setProperty("output_folder", ptumblrManager.getOutputFolder());
+            properties.setProperty("default_tags", StringUtils.join(ptumblrManager.getTags(), ","));
 
-            properties.setProperty("oauth_consumer_key", oauth_consumer_key);
-            properties.setProperty("secret_key", secret_key);
-            properties.setProperty("token", token);
-            properties.setProperty("token_secret", token_secret);
+            properties.setProperty("oauth_consumer_key", ptumblrManager.getOauthConsumerKey());
+            properties.setProperty("secret_key", ptumblrManager.getSecretKey());
+            properties.setProperty("token", ptumblrManager.getToken());
+            properties.setProperty("token_secret", ptumblrManager.getTokenSecret());
 
             properties.store(writer, "");
+
         } catch (IOException e) {
-            System.out.println("Can't save properties in " + fileName);
+            System.out.println("Can't save properties in " + CONFIG_FILE_PATH);
         }
     }
 
 
-    //Initialize user interface
-    public void initializeUI() {
-        form_ui = new PtumblrForm(input_folder, output_folder, tags, tumblrClient);
-        form_ui.addWindowListener(new WindowAdapter() {
+
+    public void connect(PtumblrManager ptumblrManager) {
+
+        final PtumblrConnect ptumblrConnect = new PtumblrConnect(ptumblrManager);
+        ptumblrConnect.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
 
-                input_folder = form_ui.getInputFolder();
-                output_folder = form_ui.getOutputFolder();
+                PtumblrManager ptumblrManager = ptumblrConnect.getPtumblrManager();
 
-                saveProperties(CONFIG_FILE_PATH);
+                if (ptumblrManager.isConnected()){
+                    initializeUI(ptumblrManager);
+                }
+            }
+        });
+    }
+
+        //Initialize user interface
+    public void initializeUI(PtumblrManager ptumblrManager) {
+        final PtumblrForm ptumblrForm = new PtumblrForm(ptumblrManager);
+
+        ptumblrForm.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+
+                PtumblrManager ptumblrManager = ptumblrForm.getPtumblrManager();
+                saveProperties(ptumblrManager);
             }
         });
     }
@@ -144,9 +125,8 @@ public class Main {
 
     //Start application
     public void start(String args[]) throws IOException {
-        loadProperties(CONFIG_FILE_PATH);
-        checkFolders();
-        initializeUI();
+        PtumblrManager ptumblrManager = loadProperties();
+        connect(ptumblrManager);
     }
 
 

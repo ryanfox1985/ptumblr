@@ -19,9 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by Adrian on 3/22/2014.
- */
+
 public class PtumblrForm extends JFrame {
     private JProgressBar prbApp;
     private JButton btnSend;
@@ -39,7 +37,12 @@ public class PtumblrForm extends JFrame {
     private List<JLabel> lblTags = new ArrayList<>();
     private List<File> images = new ArrayList<>();
     private Random rand = new Random();
-    private JumblrClient tumblrClient;
+
+    private PtumblrManager ptumblrManager;
+
+    public PtumblrManager getPtumblrManager(){
+        return ptumblrManager;
+    }
 
     public String getInputFolder() {
         return txtInputFolder.getText();
@@ -49,14 +52,14 @@ public class PtumblrForm extends JFrame {
         return txtOutputFolder.getText();
     }
 
-    private void loadTags(String[] tags) {
+    private void loadTags() {
         for (JLabel lbl : lblTags) {
             pnlTags.remove(lbl);
         }
 
         lblTags.clear();
 
-        for (String tag : tags) {
+        for (String tag : ptumblrManager.getTags()) {
             JLabel lblTag = new JLabel(tag);
             lblTag.setOpaque(true);
             lblTag.setBackground(Color.YELLOW);
@@ -217,6 +220,7 @@ public class PtumblrForm extends JFrame {
 
     public void postImage(List<String> tags) {
         // Write the user's name
+        /*
         User user = tumblrClient.user();
         System.out.println(user.getName());
 
@@ -237,6 +241,7 @@ public class PtumblrForm extends JFrame {
                         e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+        */
     }
 
     public void sendTumbler() {
@@ -264,19 +269,26 @@ public class PtumblrForm extends JFrame {
     }
 
 
-    public PtumblrForm(String input_folder, String output_folder, String[] tags, JumblrClient tumblrClient) {
+    public PtumblrForm(PtumblrManager ptumblrManager) {
         super("PTumblr App");
         setContentPane(rootPanel);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBtnEvents();
 
-        this.tumblrClient = tumblrClient;
-        txtInputFolder.setText(input_folder);
-        txtOutputFolder.setText(output_folder);
+        this.ptumblrManager = ptumblrManager;
 
-        loadTags(tags);
-        clickScanFolders();
+        File inputFolder = new File(ptumblrManager.getInputFolder());
+        if (inputFolder.exists() && inputFolder.isDirectory()){
+            txtInputFolder.setText(inputFolder.getAbsolutePath());
+        }
+
+        File outputFolder = new File(ptumblrManager.getOutputFolder());
+        if (outputFolder.exists() && outputFolder.isDirectory()){
+            txtOutputFolder.setText(outputFolder.getAbsolutePath());
+        }
+
+        loadTags();
 
         setVisible(true);
     }
