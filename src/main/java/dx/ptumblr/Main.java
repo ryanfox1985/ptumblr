@@ -5,13 +5,9 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
-import com.tumblr.jumblr.JumblrClient;
 import org.apache.commons.lang.StringUtils;
-
-import javax.swing.*;
 
 //TODO: Logs system.
 //TODO: Support multilabel.
@@ -74,7 +70,7 @@ public class Main {
             Properties properties = new Properties();
             properties.setProperty("input_folder", ptumblrManager.getInputFolder());
             properties.setProperty("output_folder", ptumblrManager.getOutputFolder());
-            properties.setProperty("default_tags", StringUtils.join(ptumblrManager.getTags(), ","));
+            properties.setProperty("default_tags", StringUtils.join(ptumblrManager.getDefaultTags(), ","));
 
             properties.setProperty("oauth_consumer_key", ptumblrManager.getOauthConsumerKey());
             properties.setProperty("secret_key", ptumblrManager.getSecretKey());

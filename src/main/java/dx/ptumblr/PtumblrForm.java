@@ -1,10 +1,6 @@
 package dx.ptumblr;
 
-import com.tumblr.jumblr.JumblrClient;
-import com.tumblr.jumblr.types.PhotoPost;
 import org.apache.commons.io.FileUtils;
-import com.tumblr.jumblr.types.User;
-import com.tumblr.jumblr.types.Blog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -31,7 +27,7 @@ public class PtumblrForm extends JFrame {
     private JButton btnScan;
     private JPanel pnlTags;
     private JLabel lblImage;
-    private JButton btnCancel;
+    private JButton btnDiscard;
 
     private File currentImage = null;
     private List<JLabel> lblTags = new ArrayList<>();
@@ -59,7 +55,7 @@ public class PtumblrForm extends JFrame {
 
         lblTags.clear();
 
-        for (String tag : ptumblrManager.getTags()) {
+        for (String tag : ptumblrManager.getDefaultTags()) {
             JLabel lblTag = new JLabel(tag);
             lblTag.setOpaque(true);
             lblTag.setBackground(Color.YELLOW);
@@ -87,7 +83,7 @@ public class PtumblrForm extends JFrame {
         }
     }
 
-    private void moveCurrentImage() {
+    private void moveToOutput() {
         Date now = new Date();
         SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd_hhmmss");
         String outputFileName = txtOutputFolder.getText() + File.separator + dt.format(now) + currentImage.getName();
@@ -103,17 +99,16 @@ public class PtumblrForm extends JFrame {
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                prbApp.setValue(prbApp.getValue() + 1);
                 sendTumbler();
+                moveToOutput();
                 loadNextImage();
             }
         });
 
-        btnCancel.addActionListener(new ActionListener() {
+        btnDiscard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                prbApp.setValue(prbApp.getValue() + 1);
-                moveCurrentImage();
+                moveToOutput();
                 loadNextImage();
             }
         });
@@ -156,10 +151,10 @@ public class PtumblrForm extends JFrame {
 
     public void clickScanFolders() {
         images.clear();
-        File input_folder = new File(txtInputFolder.getText());
+        File inputFolder = new File(txtInputFolder.getText());
 
-        if (input_folder.getPath().length() > 0) {
-            for (File fileEntry : input_folder.listFiles()) {
+        if (inputFolder.getPath().length() > 0) {
+            for (File fileEntry : inputFolder.listFiles()) {
                 if (!fileEntry.isDirectory() && !fileEntry.getName().startsWith(".")) {
                     //Check extension
                     if (fileEntry.getName().endsWith(".jpg") || fileEntry.getName().endsWith(".jpeg") || fileEntry.getName().endsWith(".gif") || fileEntry.getName().endsWith(".png")) {
@@ -179,16 +174,13 @@ public class PtumblrForm extends JFrame {
 
     public void loadNextImage() {
         resetTags();
-        //TODO: reset custom labels tags
         //TODO: reset custom comment
 
         if (images.size() > 0) {
-            int indexImage = rand.nextInt(images.size());
-            currentImage = images.get(indexImage);
+            currentImage = images.get(0);
 
             try {
                 BufferedImage myPicture = ImageIO.read(currentImage);
-
 
                 int height = myPicture.getHeight();
                 int width = myPicture.getWidth();
@@ -206,7 +198,7 @@ public class PtumblrForm extends JFrame {
                 Image dimg = myPicture.getScaledInstance(width, height, Image.SCALE_SMOOTH);
                 lblImage.setIcon(new ImageIcon(dimg));
 
-                images.remove(currentImage);
+                images.remove(0);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(rootPanel,
                         "Image could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -216,56 +208,37 @@ public class PtumblrForm extends JFrame {
             JOptionPane.showMessageDialog(rootPanel,
                     "The input folder is empty.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        prbApp.setValue(prbApp.getValue() + 1);
     }
 
-    public void postImage(List<String> tags) {
-        // Write the user's name
-        /*
-        User user = tumblrClient.user();
-        System.out.println(user.getName());
 
-        // And list their blogs
-        for (Blog blog : user.getBlogs()) {
-            System.out.println("\t" + blog.getName());
-            try {
-                PhotoPost post = tumblrClient.newPost(blog.getName(), PhotoPost.class);
-
-                //TODO: generate comment
-                //post.setQuote("hello world");
-                post.setData(currentImage);
-                post.setState("queue");
-                post.setTags(tags);
-                post.save();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(rootPanel,
-                        e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    private List<String> getTags(){
+        //GET YELLOW TAGS
+        List<String> aTags = new ArrayList<String>();
+        for (JLabel lbl : lblTags) {
+            if (lbl.getBackground() == Color.YELLOW) {
+                aTags.add(lbl.getText());
             }
         }
-        */
+
+        return aTags;
     }
 
     public void sendTumbler() {
 
         if (currentImage != null) {
-            //GET YELLOW TAGS
-            List<String> aTags = new ArrayList<String>();
-            for (JLabel lbl : lblTags) {
-                if (lbl.getBackground() == Color.YELLOW) {
-                    aTags.add(lbl.getText());
-                }
-            }
 
+            List<String> tags = getTags();
             //TODO: append custom tags
 
-
-            //send to tumblr.com
-            postImage(aTags);
-
-            //move file.
-            moveCurrentImage();
+            try{
+                ptumblrManager.queueImage(currentImage, tags);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(rootPanel,
+                        e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
-
-
     }
 
 

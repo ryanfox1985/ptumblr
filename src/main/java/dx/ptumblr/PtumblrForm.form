@@ -24,7 +24,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Send tumblr"/>
+          <text value="Send to Tumblr"/>
         </properties>
       </component>
       <grid id="d7e01" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -94,14 +94,14 @@
         <border type="none"/>
         <children/>
       </grid>
-      <component id="dc237" class="javax.swing.JButton" binding="btnCancel">
+      <component id="dc237" class="javax.swing.JButton" binding="btnDiscard">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="60" height="50"/>
           </grid>
         </constraints>
         <properties>
-          <text value="Cancel image"/>
+          <text value="Discard image"/>
         </properties>
       </component>
       <grid id="cac0a" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
